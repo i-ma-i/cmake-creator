@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FileNode } from '@/types'
 import { Button } from '@/components/ui/button'
-import { FolderIcon, FileIcon, Plus, Trash2, Edit2 } from 'lucide-react'
+import { FolderIcon, FileIcon, Plus, Trash2, Edit2, FolderPlus, ChevronRight, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface FolderTreeProps {
@@ -87,10 +87,12 @@ function TreeNode({ node, level, onSelect, onUpdate, onDelete, selectedNodeId }:
     <div className="select-none">
       <div 
         className={cn(
-          "flex items-center py-1 px-2 rounded cursor-pointer hover:bg-accent group",
-          isSelected && "bg-accent",
+          "flex items-center py-2 px-3 rounded-lg cursor-pointer group transition-all duration-200",
+          "hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20",
+          isSelected && "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 shadow-sm",
+          node.type === 'cmake' && "border-l-2 border-green-400"
         )}
-        style={{ paddingLeft: `${level * 16 + 8}px` }}
+        style={{ paddingLeft: `${level * 20 + 12}px` }}
         onClick={() => onSelect(node)}
       >
         <div className="flex items-center flex-1 min-w-0">
@@ -100,16 +102,24 @@ function TreeNode({ node, level, onSelect, onUpdate, onDelete, selectedNodeId }:
                 e.stopPropagation()
                 setIsOpen(!isOpen)
               }}
-              className="mr-1 p-0.5 hover:bg-muted rounded"
+              className="mr-2 p-1 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded transition-colors"
             >
-              {isOpen ? '▼' : '▶'}
+              {isOpen ? (
+                <ChevronDown className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+              )}
             </button>
           )}
           
           {node.type === 'folder' ? (
-            <FolderIcon className="w-4 h-4 mr-2 text-blue-500" />
+            <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 mr-3">
+              <FolderIcon className="w-3 h-3 text-white" />
+            </div>
           ) : (
-            <FileIcon className="w-4 h-4 mr-2 text-green-500" />
+            <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 mr-3">
+              <FileIcon className="w-3 h-3 text-white" />
+            </div>
           )}
           
           {isEditing ? (
@@ -124,68 +134,68 @@ function TreeNode({ node, level, onSelect, onUpdate, onDelete, selectedNodeId }:
                   setEditName(node.name)
                 }
               }}
-              className="flex-1 px-1 py-0 text-sm bg-background border rounded"
+              className="flex-1 px-2 py-1 text-sm bg-white dark:bg-slate-800 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               autoFocus
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
-            <span className="flex-1 truncate text-sm">{node.name}</span>
+            <span className="flex-1 truncate text-sm font-medium">{node.name}</span>
           )}
         </div>
         
-        <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {node.type === 'folder' && (
             <>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-7 w-7 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                 onClick={(e) => {
                   e.stopPropagation()
                   handleAddFolder()
                 }}
                 title="フォルダを追加"
               >
-                <FolderIcon className="w-3 h-3" />
+                <FolderPlus className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-7 w-7 hover:bg-green-100 dark:hover:bg-green-900/30"
                 onClick={(e) => {
                   e.stopPropagation()
                   handleAddCMake()
                 }}
                 title="CMakeLists.txtを追加"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
               </Button>
             </>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
+            className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-800"
             onClick={(e) => {
               e.stopPropagation()
               setIsEditing(true)
             }}
             title="名前を変更"
           >
-            <Edit2 className="w-3 h-3" />
+            <Edit2 className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
           </Button>
           {node.id !== 'root' && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-destructive hover:text-destructive"
+              className="h-7 w-7 hover:bg-red-100 dark:hover:bg-red-900/30"
               onClick={(e) => {
                 e.stopPropagation()
                 onDelete(node.id)
               }}
               title="削除"
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash2 className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
             </Button>
           )}
         </div>
@@ -227,23 +237,30 @@ export default function FolderTree({ data, onDataChange, onNodeSelect, selectedN
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">プロジェクト構造</h2>
-      </div>
-      <div className="border rounded-lg p-2 bg-card min-h-[400px]">
-        {data.map((node) => (
-          <TreeNode
-            key={node.id}
-            node={node}
-            level={0}
-            onSelect={onNodeSelect}
-            onUpdate={handleNodeUpdate}
-            onDelete={handleNodeDelete}
-            selectedNodeId={selectedNode?.id}
-          />
-        ))}
-      </div>
+    <div className="space-y-1">
+      {data.map((node) => (
+        <TreeNode
+          key={node.id}
+          node={node}
+          level={0}
+          onSelect={onNodeSelect}
+          onUpdate={handleNodeUpdate}
+          onDelete={handleNodeDelete}
+          selectedNodeId={selectedNode?.id}
+        />
+      ))}
+      {data.length === 1 && data[0].children?.length === 0 && (
+        <div className="text-center py-12">
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 mx-auto mb-4">
+            <FolderPlus className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+          </div>
+          <h3 className="font-medium text-foreground mb-2">プロジェクトが空です</h3>
+          <p className="text-sm text-muted-foreground">
+            フォルダアイコンをクリックして<br />
+            項目を追加してください
+          </p>
+        </div>
+      )}
     </div>
   )
 }

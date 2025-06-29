@@ -10,6 +10,7 @@ import { Plus, Trash2, Eye, FolderOpen } from 'lucide-react'
 import { useState } from 'react'
 import PreviewModal from './PreviewModal'
 import { getNodePath } from '@/utils/path'
+import { cn } from '@/lib/utils'
 
 interface CMakeFormProps {
   node: FileNode
@@ -100,22 +101,28 @@ export default function CMakeForm({ node, onUpdate, treeData }: CMakeFormProps) 
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
+    <div className="space-y-8">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">CMake設定</h2>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+              <Plus className="w-4 h-4" />
+            </div>
+            <h2 className="text-xl font-semibold">CMake設定</h2>
+          </div>
           <div className="flex gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowPreview(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-200"
             >
               <Eye className="w-4 h-4" />
               プレビュー
             </Button>
             <Button 
               onClick={form.handleSubmit(onSubmit)}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
             >
               保存
             </Button>
@@ -123,133 +130,163 @@ export default function CMakeForm({ node, onUpdate, treeData }: CMakeFormProps) 
         </div>
         
         {/* ファイルパス表示 */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-          <FolderOpen className="w-4 h-4" />
-          <span className="font-mono">
+        <div className="flex items-center gap-3 text-sm bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 px-4 py-3 rounded-xl border border-blue-200/50 dark:border-blue-800/50">
+          <FolderOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-mono text-blue-800 dark:text-blue-200">
             {filePath || '/CMakeLists.txt'}
           </span>
         </div>
       </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="cmakeVersion">CMakeバージョン</Label>
-            <Input
-              id="cmakeVersion"
-              placeholder="3.29"
-              {...form.register('cmakeVersion')}
-            />
-            {form.formState.errors.cmakeVersion && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.cmakeVersion.message}
-              </p>
-            )}
-          </div>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* 基本設定 */}
+        <div className="bg-white/50 dark:bg-slate-800/50 rounded-xl p-6 border border-border/50">
+          <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-gradient-to-br from-purple-500 to-pink-600"></div>
+            基本設定
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cmakeVersion" className="text-sm font-medium">CMakeバージョン</Label>
+              <Input
+                id="cmakeVersion"
+                placeholder="3.29"
+                {...form.register('cmakeVersion')}
+                className="bg-white dark:bg-slate-900 border-border/50 focus:border-blue-500 focus:ring-blue-500/20"
+              />
+              {form.formState.errors.cmakeVersion && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.cmakeVersion.message}
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="projectName">プロジェクト名</Label>
-            <Input
-              id="projectName"
-              placeholder="MyProject"
-              {...form.register('projectName')}
-            />
-            {form.formState.errors.projectName && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.projectName.message}
-              </p>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="projectName" className="text-sm font-medium">プロジェクト名</Label>
+              <Input
+                id="projectName"
+                placeholder="MyProject"
+                {...form.register('projectName')}
+                className="bg-white dark:bg-slate-900 border-border/50 focus:border-blue-500 focus:ring-blue-500/20"
+              />
+              {form.formState.errors.projectName && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.projectName.message}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label>言語</Label>
-          <div className="flex gap-2">
+        {/* 言語設定 */}
+        <div className="bg-white/50 dark:bg-slate-800/50 rounded-xl p-6 border border-border/50">
+          <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-gradient-to-br from-orange-500 to-red-600"></div>
+            対応言語
+          </h3>
+          <div className="flex gap-3">
             {languageOptions.map((lang) => (
               <Button
                 key={lang.value}
                 type="button"
                 variant={selectedLanguages.includes(lang.value) ? "default" : "outline"}
                 onClick={() => handleLanguageToggle(lang.value)}
-                className="text-sm"
+                className={cn(
+                  "text-sm font-medium transition-all duration-200",
+                  selectedLanguages.includes(lang.value) 
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg" 
+                    : "hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-900/20"
+                )}
               >
                 {lang.label}
               </Button>
             ))}
           </div>
           {form.formState.errors.languages && (
-            <p className="text-sm text-destructive">
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
               {form.formState.errors.languages.message}
             </p>
           )}
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-medium">ターゲット</Label>
-            <Button type="button" variant="outline" onClick={addTarget}>
-              <Plus className="w-4 h-4 mr-2" />
+        {/* ターゲット設定 */}
+        <div className="bg-white/50 dark:bg-slate-800/50 rounded-xl p-6 border border-border/50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium flex items-center gap-2">
+              <div className="w-5 h-5 rounded bg-gradient-to-br from-green-500 to-emerald-600"></div>
+              ターゲット
+            </h3>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={addTarget}
+              className="flex items-center gap-2 hover:bg-green-50 hover:border-green-200 dark:hover:bg-green-900/20"
+            >
+              <Plus className="w-4 h-4" />
               ターゲット追加
             </Button>
           </div>
 
-          {targetFields.map((field, index) => (
-            <div key={field.id} className="border rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">ターゲット {index + 1}</h4>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeTarget(index)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
+          <div className="space-y-4">
+            {targetFields.map((field, index) => (
+              <div key={field.id} className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 rounded-xl p-5 border border-slate-200/50 dark:border-slate-600/50">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-slate-800 dark:text-slate-200">ターゲット {index + 1}</h4>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeTarget(index)}
+                    className="hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
 
-              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">名前</Label>
+                    <Input
+                      placeholder="my_target"
+                      {...form.register(`targets.${index}.name`)}
+                      className="bg-white dark:bg-slate-900 border-border/50 focus:border-blue-500 focus:ring-blue-500/20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">種類</Label>
+                    <Select
+                      value={form.watch(`targets.${index}.kind`)}
+                      onValueChange={(value) => 
+                        form.setValue(`targets.${index}.kind`, value as any)
+                      }
+                    >
+                      <SelectTrigger className="bg-white dark:bg-slate-900 border-border/50 focus:border-blue-500 focus:ring-blue-500/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {targetKindOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label>名前</Label>
-                  <Input
-                    placeholder="my_target"
-                    {...form.register(`targets.${index}.name`)}
+                  <Label className="text-sm font-medium">ソースファイル（改行区切り）</Label>
+                  <textarea
+                    className="w-full min-h-[80px] rounded-lg border border-border/50 bg-white dark:bg-slate-900 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    placeholder="main.cpp&#10;utils.cpp"
+                    value={form.watch(`targets.${index}.sources`)?.join('\n') || ''}
+                    onChange={(e) => {
+                      const sources = e.target.value.split('\n').filter(s => s.trim())
+                      form.setValue(`targets.${index}.sources`, sources)
+                    }}
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label>種類</Label>
-                  <Select
-                    value={form.watch(`targets.${index}.kind`)}
-                    onValueChange={(value) => 
-                      form.setValue(`targets.${index}.kind`, value as any)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {targetKindOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>ソースファイル（改行区切り）</Label>
-                <textarea
-                  className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  placeholder="main.cpp&#10;utils.cpp"
-                  value={form.watch(`targets.${index}.sources`)?.join('\n') || ''}
-                  onChange={(e) => {
-                    const sources = e.target.value.split('\n').filter(s => s.trim())
-                    form.setValue(`targets.${index}.sources`, sources)
-                  }}
-                />
-              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -293,34 +330,52 @@ export default function CMakeForm({ node, onUpdate, treeData }: CMakeFormProps) 
               </div>
             </div>
           ))}
+          </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-medium">コンパイルオプション</Label>
-            <Button type="button" variant="outline" onClick={addOption}>
-              <Plus className="w-4 h-4 mr-2" />
+        {/* コンパイルオプション */}
+        <div className="bg-white/50 dark:bg-slate-800/50 rounded-xl p-6 border border-border/50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium flex items-center gap-2">
+              <div className="w-5 h-5 rounded bg-gradient-to-br from-yellow-500 to-orange-600"></div>
+              コンパイルオプション
+            </h3>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={addOption}
+              className="flex items-center gap-2 hover:bg-yellow-50 hover:border-yellow-200 dark:hover:bg-yellow-900/20"
+            >
+              <Plus className="w-4 h-4" />
               オプション追加
             </Button>
           </div>
 
-          {optionFields.map((_, index) => (
-            <div key={index} className="flex gap-2">
-              <Input
-                placeholder="-Wall"
-                {...form.register(`options.${index}`)}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => removeOption(index)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
+          <div className="space-y-3">
+            {optionFields.map((_, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  placeholder="-Wall"
+                  {...form.register(`options.${index}`)}
+                  className="flex-1 bg-white dark:bg-slate-900 border-border/50 focus:border-blue-500 focus:ring-blue-500/20"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeOption(index)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+            {optionFields.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                コンパイルオプションが設定されていません
+              </p>
+            )}
+          </div>
         </div>
       </form>
 
