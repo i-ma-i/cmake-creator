@@ -87,15 +87,6 @@ npm run test:ui
 
 ## 🛠️ 開発
 
-### コード品質
-
-```bash
-# ESLintによるコードチェック
-npm run lint
-
-# Prettierによるコード整形
-npm run format
-```
 
 ### プロジェクト構造
 
@@ -179,7 +170,6 @@ cmake-creator/
 ### 開発ガイドライン
 
 - TypeScriptによる型安全な開発
-- ESLint + Prettierによるコード品質管理
 - Vitestによるテスト駆動開発
 - コンポーネントの単一責任原則
 - アクセシビリティの考慮（WCAG AA準拠）
