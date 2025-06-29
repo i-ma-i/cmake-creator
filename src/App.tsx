@@ -23,7 +23,6 @@ function App() {
     saveProject, 
     loadProject, 
     resetProject, 
-    hasSavedProject, 
     getLastSavedTime 
   } = useProjectPersistence()
 

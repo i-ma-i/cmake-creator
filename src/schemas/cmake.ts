@@ -22,7 +22,14 @@ export const cmakeFormSchema = z.object({
   options: z.array(z.string()).default([]),
 });
 
-export const fileNodeSchema = z.object({
+export const fileNodeSchema: z.ZodType<{
+  id: string;
+  name: string;
+  type: "folder" | "cmake";
+  children?: any[];
+  cmakeForm?: any;
+  parentId?: string;
+}> = z.object({
   id: z.string(),
   name: z.string().min(1, "ファイル名は必須です"),
   type: z.enum(["folder", "cmake"]),

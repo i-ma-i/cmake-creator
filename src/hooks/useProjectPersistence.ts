@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import { FileNode } from '@/types'
 import { useLocalStorage } from './useLocalStorage'
 

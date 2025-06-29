@@ -55,10 +55,15 @@ export default function CMakeForm({ node, onUpdate, treeData }: CMakeFormProps) 
     name: 'targets'
   })
 
-  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
-    control: form.control,
-    name: 'options'
-  })
+  const optionFields = form.watch('options') || []
+  const appendOption = (value: string) => {
+    const currentOptions = form.getValues('options') || []
+    form.setValue('options', [...currentOptions, value])
+  }
+  const removeOption = (index: number) => {
+    const currentOptions = form.getValues('options') || []
+    form.setValue('options', currentOptions.filter((_, i) => i !== index))
+  }
 
   const onSubmit = (data: CMakeFormData) => {
     const updatedNode = {
@@ -299,8 +304,8 @@ export default function CMakeForm({ node, onUpdate, treeData }: CMakeFormProps) 
             </Button>
           </div>
 
-          {optionFields.map((field, index) => (
-            <div key={field.id} className="flex gap-2">
+          {optionFields.map((_, index) => (
+            <div key={index} className="flex gap-2">
               <Input
                 placeholder="-Wall"
                 {...form.register(`options.${index}`)}
