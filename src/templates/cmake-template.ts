@@ -24,12 +24,12 @@ target_link_libraries({{name}} PUBLIC
 {{#if compileDefs}}
 target_compile_definitions({{name}} PUBLIC
   {{#each compileDefs}}
-    {{this}}
+    {{{this}}}
   {{/each}}
 )
 {{/if}}
 {{/each}}
 
 {{#each options}}
-add_compile_options({{this}})
+add_compile_options({{{this}}})
 {{/each}}`
