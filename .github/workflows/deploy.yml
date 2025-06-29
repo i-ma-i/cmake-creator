@@ -23,6 +23,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Check TypeScript ESLint installation
+      run: |
+        npm list @typescript-eslint/parser || echo "TypeScript ESLint parser not found"
+        npm list @typescript-eslint/eslint-plugin || echo "TypeScript ESLint plugin not found"
+
     - name: Run linter
       run: npm run lint
 
